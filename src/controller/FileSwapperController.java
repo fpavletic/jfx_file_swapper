@@ -69,8 +69,6 @@ public class FileSwapperController {
         @Override
         public void run(){
             try {
-                PrintWriter logger = new PrintWriter(new File("./log.txt"));
-
                 WatchService service = FileSystems.getDefault().newWatchService();
                 dirToWatch.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
@@ -82,23 +80,17 @@ public class FileSwapperController {
                         Thread.sleep(100); // Files do not get switched if this is not here.
                         try {
                             WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
-                            logger.println(pathEvent.context());
                             if ( pathEvent.context().equals(fileToWatch.getFileName())) {
                                 Files.delete(fileToWatch);
                                 Files.move(fileToMove, fileToWatch);
                                 fileMoved = true;
-                                logger.println("File moved");
                             }
                         } catch ( Exception e ) {
-                            logger.println(e.getMessage());
                             /* ¯\_(ツ)_/¯ */
                         }
                     }
                     key.reset();
                 }
-
-                logger.flush();
-                logger.close();
             } catch ( Exception e ){
                 /* ¯\_(ツ)_/¯ */
             }
