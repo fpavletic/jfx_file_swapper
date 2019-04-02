@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -19,8 +20,11 @@ public class FileSwapperView extends GridPane {
 
 
     public FileSwapperView(Stage stage){
-        setPadding(new Insets(15, 12, 15, 12));
-        getColumnConstraints().add(new ColumnConstraints(200));
+        setPadding(new Insets(8, 8, 8, 8));
+        getColumnConstraints().add(new ColumnConstraints(65));
+        setHgap(5);
+        setVgap(5);
+
         controller = new FileSwapperController();
         initView(stage);
     }
@@ -30,35 +34,45 @@ public class FileSwapperView extends GridPane {
         fileChooser.setTitle("Pick file to be moved");
 
         Button pickFileButton = new Button("Pick file");
-        pickFileButton.setOnAction(event -> controller.setFileToMove(fileChooser.showOpenDialog(stage)));
-        add(pickFileButton, 1, 0);
+        pickFileButton.setOnAction(event -> {
+            controller.setFileToMove(fileChooser.showOpenDialog(stage));
+            stage.sizeToScene();
+    });
+        add(pickFileButton, 0, 0);
 
         Label pickedFileLabel = new Label();
         pickedFileLabel.textProperty().bind(controller.fileToMoveStringProperty());
-        add(pickedFileLabel, 0, 0);
+        add(pickedFileLabel, 1, 0);
 
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Pick dir to watch");
 
         Button pickDirButton = new Button("Pick dir");
-        pickDirButton.setOnAction(event -> controller.setDirToWatch(dirChooser.showDialog(stage)));
-        add(pickDirButton, 1, 1);
+        pickDirButton.setOnAction(event -> {
+            controller.setDirToWatch(dirChooser.showDialog(stage));
+            stage.sizeToScene();
+        });
+        add(pickDirButton, 0, 1);
 
         Label pickedDirLabel = new Label();
         pickedDirLabel.textProperty().bind(controller.dirToWatchStringProperty());
-        add(pickedDirLabel, 0, 1);
+        add(pickedDirLabel, 1, 1);
 
         Button startButton = new Button("Start");
         startButton.setOnAction(event -> {
             try {
                 controller.startListening();
+                stage.sizeToScene();
             } catch ( IOException | InterruptedException e ) {
                 e.printStackTrace();
             }
         });
-        add(startButton, 1, 2);
+        add(startButton, 0, 2);
 
-
+        Label processStartedLabel = new Label();
+        processStartedLabel.textProperty().bind(controller.processInfoStringPropery());
+        processStartedLabel.setTextFill(Color.GREEN);
+        add(processStartedLabel, 1, 2);
 
     }
 }

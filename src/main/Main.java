@@ -10,7 +10,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         primaryStage.setTitle("File Swapper");
-        primaryStage.setScene(new Scene(new FileSwapperView(primaryStage), 300, 100));
+        primaryStage.setScene(new Scene(new FileSwapperView(primaryStage)));
+        primaryStage.sizeToScene();
         primaryStage.show();
     }
 

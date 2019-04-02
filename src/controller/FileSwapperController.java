@@ -14,6 +14,7 @@ public class FileSwapperController {
     private StringProperty dirToWatchString = new SimpleStringProperty("No dir selected...");
     private Path fileToMove;
     private StringProperty fileToMoveString = new SimpleStringProperty("No file selected...");
+    private StringProperty processInfo = new SimpleStringProperty("");
 
     public Path getDirToWatch(){
         return dirToWatch;
@@ -41,6 +42,10 @@ public class FileSwapperController {
         return fileToMoveString;
     }
 
+    public StringProperty processInfoStringPropery(){
+        return processInfo;
+    }
+
     public String startListening() throws IOException, InterruptedException{
         if ( !Files.exists(dirToWatch) || !Files.isDirectory(dirToWatch)){
             return "Invalid directory path!";
@@ -51,6 +56,7 @@ public class FileSwapperController {
         }
 
         new Thread(new FileSwapListener(dirToWatch, fileToMove)).start();
+        processInfo.setValue(String.format("Watching for %s in %s", fileToMove.getFileName().toString(), dirToWatch.toString()));
         return null;
     }
 
