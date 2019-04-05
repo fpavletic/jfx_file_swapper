@@ -5,7 +5,6 @@ import javafx.beans.property.StringProperty;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.*;
 
 public class FileSwapperController {
@@ -16,17 +15,10 @@ public class FileSwapperController {
     private StringProperty fileToMoveString = new SimpleStringProperty("No file selected...");
     private StringProperty processInfo = new SimpleStringProperty("");
 
-    public Path getDirToWatch(){
-        return dirToWatch;
-    }
 
     public void setDirToWatch(File dirToWatch){
         this.dirToWatch = dirToWatch == null ? null : dirToWatch.toPath();
         dirToWatchString.setValue(dirToWatch == null ? "No dir selected..." : dirToWatch.toString());
-    }
-
-    public Path getFileToMove(){
-        return fileToMove;
     }
 
     public void setFileToMove(File fileToMove){
@@ -56,7 +48,7 @@ public class FileSwapperController {
         }
 
         new Thread(new FileSwapListener(dirToWatch, fileToMove)).start();
-        processInfo.setValue(String.format("Watching for %s in %s", fileToMove.getFileName().toString(), dirToWatch.toString()));
+        processInfo.setValue(String.format("Listening for %s in %s", fileToMove.getFileName().toString(), dirToWatch.toString()));
         return null;
     }
 
@@ -81,9 +73,9 @@ public class FileSwapperController {
                 boolean fileMoved = false;
 
                 while ( !fileMoved ) {
-                    WatchKey key = service.take();
+                    WatchKey key = service.take(); //This is a blocking call
                     for ( WatchEvent<?> event : key.pollEvents() ) {
-                        Thread.sleep(100); // Files do not get switched if this is not here.
+                        Thread.sleep(100); // Files do not get switched if there is no delay.
                         try {
                             WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
                             if ( pathEvent.context().equals(fileToWatch.getFileName())) {
@@ -92,13 +84,13 @@ public class FileSwapperController {
                                 fileMoved = true;
                             }
                         } catch ( Exception e ) {
-                            /* ¯\_(ツ)_/¯ */
+                           processInfo.setValue(e.getLocalizedMessage());
                         }
                     }
                     key.reset();
                 }
             } catch ( Exception e ){
-                /* ¯\_(ツ)_/¯ */
+                processInfo.setValue(e.getLocalizedMessage());
             }
         }
     }
